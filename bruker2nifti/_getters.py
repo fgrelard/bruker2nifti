@@ -16,12 +16,9 @@ def get_list_scans(start_path, print_structure=True):
     """
 
     scans_list = []
-
     for dirpath, dirnames, filenames in os.walk(start_path):
-
         if dirpath == start_path:
             scans_list = [d for d in dirnames if d.isdigit()]
-
         level = dirpath.replace(start_path, '').count(os.sep)
         indent = (' ' * 4) * level
         if print_structure:
@@ -258,14 +255,34 @@ def nifti_getter(img_data_vol,
                             dims.append(int(dd.replace('(', '').replace(')', '').split(',')[0]))
 
                         if np.prod(dims) == sh[-1]:
+                            is_complex = False
                             sh = vol_pre_shape[:-1] + dims
+
+                            if (len(dims) > 2):
+                                is_complex = True
+                                newval = np.prod(dims[1:])
+                                dims = [dims[0]]
+                                dims += [newval]
+
+                            sh2 = vol_pre_shape[:-1] + dims
                             # A
                             if fg_echo > -1:
                                 # MSME
-                                stack_data = np.zeros(sh, dtype=vol_data.dtype)
-                                for t in range(sh[3]):
+                                stack_data = np.zeros(sh2, dtype=vol_data.dtype)
+
+                                if is_complex:
                                     for z in range(sh[2]):
-                                        stack_data[:, :, z, t] = vol_data[:, :, z * sh[3] + t]
+                                        for c in range(sh[4]):
+                                            for t in range(sh[3]):
+                                                index= z * sh[3] + t + c * sh[3] * sh[2]
+                                                index_tc = c*sh[3] + t
+                                                stack_data[:, :, z, index_tc]= vol_data[:, :, index]
+
+
+                                else:
+                                    for t in range(sh[3]):
+                                        for z in range(sh[2]):
+                                            stack_data[:, :, z, t] = vol_data[:, :, z * sh[3] + t]
 
                                 vol_data = np.copy(stack_data)
                             # B
