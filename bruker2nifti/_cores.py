@@ -309,9 +309,11 @@ def write_struct(bruker_struct,
     summary_info = {}
 
     for i in range(len(bruker_struct['visu_pars_list'])):
-
         if len(bruker_struct['nib_scans_list']) > 1:
-            i_label = '_subscan_' + str(i) + '_'
+            if bruker_struct['visu_pars_list'][i].has_key('VisuProcessingNumber'):
+                i_label = '_subscan_' + str(int(bruker_struct['visu_pars_list'][i]['VisuProcessingNumber'])) + '_'
+            else:
+                i_label = '_subscan_' + str(i) + '_'
         else:
             i_label = '_'
 
