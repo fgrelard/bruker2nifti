@@ -69,8 +69,6 @@ class Bruker2Nifti(object):
 
         if not os.path.isdir(self.pfo_study_bruker_input):
             raise IOError('Input folder does not exist.')
-        if not os.path.isdir(self.pfo_study_nifti_output):
-            raise IOError('Output folder does not exist.')
         if self.scans_list is None:
             self.scans_list = get_list_scans(self.pfo_study_bruker_input, print_structure=False)
             assert isinstance(self.scans_list, list)
